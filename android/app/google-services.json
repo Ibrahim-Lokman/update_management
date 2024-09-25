@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "662940144709",
+    "firebase_url": "https://updatemanager-ca1ad-default-rtdb.firebaseio.com",
+    "project_id": "updatemanager-ca1ad",
+    "storage_bucket": "updatemanager-ca1ad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662940144709:android:e27c17b965f85eb853bf2c",
+        "android_client_info": {
+          "package_name": "com.example.update_management"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAATq1P-G5P0yqLPIkoZMR2ucqF5pc_ebE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

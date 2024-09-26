@@ -1,0 +1,48 @@
+// import 'package:flutter/material.dart';
+// import '../models/update_info.dart';
+
+// class UpdateScreen extends StatelessWidget {
+//   final UpdateInfo updateInfo;
+//   final VoidCallback onUpdate;
+
+//   const UpdateScreen({
+//     Key? key,
+//     required this.updateInfo,
+//     required this.onUpdate,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Update Required'),
+//         automaticallyImplyLeading: false,
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             Text(
+//               'A new version (${updateInfo.latestVersion}) is available.',
+//               style: Theme.of(context).textTheme.headline6,
+//               textAlign: TextAlign.center,
+//             ),
+//             const SizedBox(height: 16),
+//             Text(
+//               updateInfo.releaseNotes,
+//               style: Theme.of(context).textTheme.bodyText2,
+//               textAlign: TextAlign.center,
+//             ),
+//             const SizedBox(height: 32),
+//             ElevatedButton(
+//               onPressed: onUpdate,
+//               child: const Text('Update Now'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

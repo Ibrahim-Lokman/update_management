@@ -9,4 +9,9 @@ class VersionComparator {
       AppVersion currentVersion, AppVersion latestVersion) {
     return compare(currentVersion, latestVersion) < 0;
   }
+
+  static bool isVersionBelowMinTolerance(
+      AppVersion currentVersion, AppVersion minToleranceVersion) {
+    return compare(currentVersion, minToleranceVersion) < 0;
+  }
 }

@@ -13,13 +13,24 @@ class ApiVersionCheck implements VersionCheckService {
 
   @override
   Future<UpdateInfo> checkVersion(AppVersion currentVersion) async {
-    final response =
-        await http.get(Uri.parse('$apiUrl?current_version=$currentVersion'));
+    final dummyData = {
+      'latest_version': '1.1.0',
+      'min_tolerated_version': '1.0.0',
+      'update_type': 'force',
+      'update_url': 'https://example.com/update',
+      'release_notes': 'Bug fixes and performance improvements.'
+    };
+    // final response =
+    //     await http.get(Uri.parse('$apiUrl?current_version=$currentVersion'));
+
+    final response = http.Response(json.encode(dummyData), 200);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       return UpdateInfo(
         latestVersion: AppVersion.fromString(data['latest_version']),
+        minToleratedVersion:
+            AppVersion.fromString(data['min_tolerated_version']),
         updateType: UpdateType.values.firstWhere(
           (e) => e.toString() == 'UpdateType.${data['update_type']}',
           orElse: () => UpdateType.none,

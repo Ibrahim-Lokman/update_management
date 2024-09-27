@@ -15,7 +15,6 @@ void main() async {
 
   final forceUpdateManager = setupForceUpdate(
     versionCheckService: apiVersionCheck,
-    updateService: UpdateService(),
     currentVersion: currentVersion,
   );
 

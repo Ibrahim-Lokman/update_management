@@ -14,7 +14,7 @@ class ApiVersionCheck implements VersionCheckService {
     final dummyData = {
       'latest_version': '1.3.0',
       'min_tolerated_version': '1.0.0',
-      'update_type': 'force',
+      'update_type': 'soft',
       'update_url':
           'https://play.google.com/store/apps/details?id=tech.innospace.brritto',
       'release_notes': 'Bug fixes and performance improvements.'

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:update_management/feature/force_update/models/update_info.dart';
 import 'package:update_management/feature/force_update/ui/update_screen.dart';
 import 'package:update_management/feature/force_update/services/version_check/version_check_service.dart';
-import 'package:update_management/feature/force_update/services/update_service.dart';
 import 'package:update_management/feature/force_update/ui/update_dialog.dart';
 
 // Export UI components
@@ -14,16 +14,13 @@ export 'models/update_info.dart';
 
 // Export services
 export 'services/version_check/version_check_service.dart';
-export 'services/update_service.dart';
 
 class ForceUpdateManager {
   final VersionCheckService versionCheckService;
-  final UpdateService updateService;
   final AppVersion currentVersion;
 
   ForceUpdateManager({
     required this.versionCheckService,
-    required this.updateService,
     required this.currentVersion,
   });
 
@@ -68,7 +65,7 @@ class ForceUpdateManager {
         MaterialPageRoute(
           builder: (context) => ForceUpdateScreen(
             updateInfo: updateInfo,
-            onUpdate: () => updateService.performUpdate(updateInfo.updateUrl),
+            onUpdate: () => performUpdate(updateInfo.updateUrl),
           ),
         ),
       );
@@ -78,11 +75,20 @@ class ForceUpdateManager {
         barrierDismissible: true,
         builder: (context) => UpdateDialog(
           updateInfo: updateInfo,
-          onUpdate: () => updateService.performUpdate(updateInfo.updateUrl),
+          onUpdate: () => performUpdate(updateInfo.updateUrl),
           onLater: () => Navigator.of(context).pop(),
           isForceUpdate: false,
         ),
       );
+    }
+  }
+
+  Future<void> performUpdate(String updateUrl) async {
+    final Uri url = Uri.parse(updateUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $updateUrl';
     }
   }
 }
@@ -96,12 +102,10 @@ enum DialogType {
 // Convenience function for quick setup
 ForceUpdateManager setupForceUpdate({
   required VersionCheckService versionCheckService,
-  required UpdateService updateService,
   required AppVersion currentVersion,
 }) {
   return ForceUpdateManager(
     versionCheckService: versionCheckService,
-    updateService: updateService,
     currentVersion: currentVersion,
   );
 }

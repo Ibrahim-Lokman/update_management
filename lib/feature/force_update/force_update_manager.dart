@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:update_management/feature/force_update/models/update_info.dart';
 import 'package:update_management/feature/force_update/ui/update_screen.dart';
 import 'package:update_management/feature/force_update/services/version_check/version_check_service.dart';
+import 'package:update_management/feature/force_update/services/version_check/api_version_check.dart';
 import 'package:update_management/feature/force_update/ui/update_dialog.dart';
 
 // Export UI components
@@ -16,13 +18,22 @@ export 'models/update_info.dart';
 export 'services/version_check/version_check_service.dart';
 
 class ForceUpdateManager {
+  static ForceUpdateManager? _instance;
   final VersionCheckService versionCheckService;
   final AppVersion currentVersion;
 
-  ForceUpdateManager({
+  ForceUpdateManager._({
     required this.versionCheckService,
     required this.currentVersion,
   });
+
+  static ForceUpdateManager get instance {
+    if (_instance == null) {
+      throw Exception(
+          "ForceUpdateManager not initialized. Call initializeForceUpdateManager() first.");
+    }
+    return _instance!;
+  }
 
   Future<void> checkForUpdates(BuildContext context) async {
     try {
@@ -99,20 +110,22 @@ enum DialogType {
   none,
 }
 
-// Convenience function for quick setup
-ForceUpdateManager setupForceUpdate({
-  required VersionCheckService versionCheckService,
-  required AppVersion currentVersion,
-}) {
-  return ForceUpdateManager(
-    versionCheckService: versionCheckService,
+Future<void> initializeForceUpdateManager() async {
+  final packageInfo = await PackageInfo.fromPlatform();
+  final currentVersion = AppVersion.fromString(packageInfo.version);
+
+  final apiVersionCheck =
+      ApiVersionCheck('https://your-api-endpoint.com/version');
+
+  ForceUpdateManager._instance = ForceUpdateManager._(
+    versionCheckService: apiVersionCheck,
     currentVersion: currentVersion,
   );
 }
 
-// Example usage function
-void checkForUpdates(BuildContext context, ForceUpdateManager manager) {
+Future<void> checkForUpdates(BuildContext context) async {
+  await initializeForceUpdateManager();
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    manager.checkForUpdates(context);
+    ForceUpdateManager.instance.checkForUpdates(context);
   });
 }

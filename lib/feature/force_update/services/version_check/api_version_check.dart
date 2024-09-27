@@ -13,7 +13,7 @@ class ApiVersionCheck implements VersionCheckService {
   Future<UpdateInfo> checkVersion(AppVersion currentVersion) async {
     final dummyData = {
       'latest_version': '1.3.0',
-      'min_tolerated_version': '1.0.0',
+      'min_tolerated_version': '1.2.0',
       'update_type': 'soft',
       'update_url':
           'https://play.google.com/store/apps/details?id=tech.innospace.brritto',

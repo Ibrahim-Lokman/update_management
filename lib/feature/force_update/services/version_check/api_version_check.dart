@@ -1,7 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:update_management/feature/force_update/models/app_version.dart';
 import 'package:update_management/feature/force_update/models/update_info.dart';
-import 'package:update_management/feature/force_update/models/update_type.dart';
 import 'dart:convert';
 
 import 'package:update_management/feature/force_update/services/version_check/version_check_service.dart';
@@ -14,10 +12,11 @@ class ApiVersionCheck implements VersionCheckService {
   @override
   Future<UpdateInfo> checkVersion(AppVersion currentVersion) async {
     final dummyData = {
-      'latest_version': '1.1.0',
+      'latest_version': '1.3.0',
       'min_tolerated_version': '1.0.0',
       'update_type': 'force',
-      'update_url': 'https://example.com/update',
+      'update_url':
+          'https://play.google.com/store/apps/details?id=tech.innospace.brritto',
       'release_notes': 'Bug fixes and performance improvements.'
     };
     // final response =

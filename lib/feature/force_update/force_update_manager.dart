@@ -3,19 +3,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:update_management/feature/force_update/models/update_info.dart';
 import 'package:update_management/feature/force_update/ui/update_screen.dart';
-import 'package:update_management/feature/force_update/services/version_check/version_check_service.dart';
 import 'package:update_management/feature/force_update/services/version_check/api_version_check.dart';
 import 'package:update_management/feature/force_update/ui/update_dialog.dart';
-
-// Export UI components
-export 'ui/update_dialog.dart';
-export 'ui/update_screen.dart';
-
-// Export models
-export 'models/update_info.dart';
-
-// Export services
-export 'services/version_check/version_check_service.dart';
 
 class ForceUpdateManager {
   static ForceUpdateManager? _instance;
@@ -38,7 +27,7 @@ class ForceUpdateManager {
   Future<void> checkForUpdates(BuildContext context) async {
     try {
       final updateInfo = await versionCheckService.checkVersion(currentVersion);
-      final dialogType = _determineDialogType(updateInfo);
+      final dialogType = determineDialogType(updateInfo);
       if (dialogType != DialogType.none) {
         await _showUpdatePrompt(context, updateInfo, dialogType);
       }
@@ -47,20 +36,28 @@ class ForceUpdateManager {
     }
   }
 
-  DialogType _determineDialogType(UpdateInfo updateInfo) {
-    final isCurrentOlderThanLatest =
-        currentVersion.compareTo(updateInfo.latestVersion) < 0;
-    final isCurrentOlderThanMinTolerated =
-        currentVersion.compareTo(updateInfo.minToleratedVersion) < 0;
-
-    if (isCurrentOlderThanMinTolerated) {
+  DialogType determineDialogType(UpdateInfo updateInfo) {
+    if (updateInfo.minToleratedVersion != null &&
+        currentVersion.compareTo(updateInfo.minToleratedVersion!) < 0) {
       return DialogType.force;
-    } else if (isCurrentOlderThanLatest) {
-      if (updateInfo.updateType == UpdateType.force) {
-        return DialogType.force;
-      } else if (updateInfo.updateType == UpdateType.soft ||
-          updateInfo.updateType == UpdateType.none) {
-        return DialogType.soft;
+    }
+
+    if (updateInfo.latestVersion == null) {
+      return DialogType.none;
+    }
+
+    final isCurrentOlderThanLatest =
+        currentVersion.compareTo(updateInfo.latestVersion!) < 0;
+
+    if (isCurrentOlderThanLatest) {
+      switch (updateInfo.updateType) {
+        case UpdateType.force:
+          return DialogType.force;
+        case UpdateType.soft:
+          return DialogType.soft;
+        case UpdateType.none:
+        case null:
+          return DialogType.none;
       }
     }
 
@@ -76,7 +73,7 @@ class ForceUpdateManager {
         MaterialPageRoute(
           builder: (context) => ForceUpdateScreen(
             updateInfo: updateInfo,
-            onUpdate: () => performUpdate(updateInfo.updateUrl),
+            onUpdate: () => performUpdate(context, updateInfo.updateUrl),
           ),
         ),
       );
@@ -86,7 +83,7 @@ class ForceUpdateManager {
         barrierDismissible: true,
         builder: (context) => UpdateDialog(
           updateInfo: updateInfo,
-          onUpdate: () => performUpdate(updateInfo.updateUrl),
+          onUpdate: () => performUpdate(context, updateInfo.updateUrl),
           onLater: () => Navigator.of(context).pop(),
           isForceUpdate: false,
         ),
@@ -94,12 +91,21 @@ class ForceUpdateManager {
     }
   }
 
-  Future<void> performUpdate(String updateUrl) async {
-    final Uri url = Uri.parse(updateUrl);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+  Future<void> performUpdate(BuildContext context, String? updateUrl) async {
+    if (updateUrl == null) {
+      // Show SnackBar using the passed BuildContext
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Try Again Later.'),
+        ),
+      );
     } else {
-      throw 'Could not launch $updateUrl';
+      final Uri url = Uri.parse(updateUrl);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        throw 'Could not launch $updateUrl';
+      }
     }
   }
 }
@@ -110,7 +116,7 @@ enum DialogType {
   none,
 }
 
-Future<void> initializeForceUpdateManager() async {
+Future<void> checkForUpdates(BuildContext context) async {
   final packageInfo = await PackageInfo.fromPlatform();
   final currentVersion = AppVersion.fromString(packageInfo.version);
 
@@ -121,10 +127,6 @@ Future<void> initializeForceUpdateManager() async {
     versionCheckService: apiVersionCheck,
     currentVersion: currentVersion,
   );
-}
-
-Future<void> checkForUpdates(BuildContext context) async {
-  await initializeForceUpdateManager();
   WidgetsBinding.instance.addPostFrameCallback((_) {
     ForceUpdateManager.instance.checkForUpdates(context);
   });

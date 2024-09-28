@@ -2,7 +2,9 @@ import 'package:http/http.dart' as http;
 import 'package:update_management/feature/force_update/models/update_info.dart';
 import 'dart:convert';
 
-import 'package:update_management/feature/force_update/services/version_check/version_check_service.dart';
+abstract class VersionCheckService {
+  Future<UpdateInfo> checkVersion(AppVersion currentVersion);
+}
 
 class ApiVersionCheck implements VersionCheckService {
   final String apiUrl;
@@ -12,12 +14,12 @@ class ApiVersionCheck implements VersionCheckService {
   @override
   Future<UpdateInfo> checkVersion(AppVersion currentVersion) async {
     final dummyData = {
-      'latest_version': '1.3.0',
-      'min_tolerated_version': '1.2.0',
-      'update_type': 'soft',
-      'update_url':
+      // 'latestVersion': '1.3.0',
+      'minToleratedVersion': '1.1.0',
+      'updateType': 'soft',
+      'updateUrl':
           'https://play.google.com/store/apps/details?id=tech.innospace.brritto',
-      'release_notes': 'Bug fixes and performance improvements.'
+      'releaseNotes': 'Bug fixes and performance improvements.'
     };
     // final response =
     //     await http.get(Uri.parse('$apiUrl?current_version=$currentVersion'));
@@ -25,18 +27,8 @@ class ApiVersionCheck implements VersionCheckService {
     final response = http.Response(json.encode(dummyData), 200);
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return UpdateInfo(
-        latestVersion: AppVersion.fromString(data['latest_version']),
-        minToleratedVersion:
-            AppVersion.fromString(data['min_tolerated_version']),
-        updateType: UpdateType.values.firstWhere(
-          (e) => e.toString() == 'UpdateType.${data['update_type']}',
-          orElse: () => UpdateType.none,
-        ),
-        updateUrl: data['update_url'],
-        releaseNotes: data['release_notes'],
-      );
+      final Map<String, dynamic> data = json.decode(response.body);
+      return UpdateInfo.fromJson(data);
     } else {
       throw Exception('Failed to check for updates');
     }

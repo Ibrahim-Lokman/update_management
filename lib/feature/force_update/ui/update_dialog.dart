@@ -23,9 +23,21 @@ class UpdateDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('A new version (${updateInfo.latestVersion}) is available.'),
+          Text(
+              'A new version (${updateInfo.latestVersion?.toString() ?? 'Unknown'}) is available.'),
           const SizedBox(height: 8),
-          Text(updateInfo.releaseNotes),
+          updateInfo.releaseNotes == null
+              ? SizedBox.shrink()
+              : Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    Text(
+                      updateInfo.releaseNotes.toString(),
+                      style: Theme.of(context).textTheme.bodyText1,
+                      textAlign: TextAlign.start,
+                    ),
+                  ],
+                ),
           if (isForceUpdate)
             const Text(
               '\nThis update is required to continue using the app.',

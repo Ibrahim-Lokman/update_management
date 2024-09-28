@@ -25,16 +25,22 @@ class ForceUpdateScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'A new version (${updateInfo.latestVersion}) is available.',
+              'A new version (${updateInfo.latestVersion?.toString() ?? 'Unknown'}) is available.',
               style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
-            Text(
-              updateInfo.releaseNotes,
-              style: Theme.of(context).textTheme.bodyText1,
-              textAlign: TextAlign.center,
-            ),
+            updateInfo.releaseNotes == null
+                ? SizedBox.shrink()
+                : Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      Text(
+                        updateInfo.releaseNotes.toString(),
+                        style: Theme.of(context).textTheme.bodyText1,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
             const SizedBox(height: 24),
             const Text(
               'This update is required to continue using the app.',

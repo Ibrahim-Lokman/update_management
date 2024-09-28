@@ -1,17 +1,59 @@
 class UpdateInfo {
-  final AppVersion latestVersion;
-  final AppVersion minToleratedVersion;
-  final UpdateType updateType;
-  final String updateUrl;
-  final String releaseNotes;
+  final AppVersion? latestVersion;
+  final AppVersion? minToleratedVersion;
+  final UpdateType? updateType;
+  final String? updateUrl;
+  final String? releaseNotes;
 
   UpdateInfo({
-    required this.latestVersion,
-    required this.minToleratedVersion,
-    required this.updateType,
-    required this.updateUrl,
-    required this.releaseNotes,
+    this.latestVersion,
+    this.minToleratedVersion,
+    this.updateType,
+    this.updateUrl,
+    this.releaseNotes,
   });
+
+  factory UpdateInfo.fromJson(Map<String, dynamic> json) {
+    return UpdateInfo(
+      latestVersion: json['latestVersion'] != null
+          ? AppVersion.fromString(json['latestVersion'])
+          : null,
+      minToleratedVersion: json['minToleratedVersion'] != null
+          ? AppVersion.fromString(json['minToleratedVersion'])
+          : null,
+      // updateType: json['updateType'] != null
+      //     ? UpdateType.values.firstWhere(
+      //         (e) => e.toString() == 'UpdateType.${json['updateType']}',
+      //         orElse: () => UpdateType.none,
+      //       )
+      //     : null,
+      updateType: _parseUpdateType(json['updateType']),
+      updateUrl: json['updateUrl'],
+      releaseNotes: json['releaseNotes'],
+    );
+  }
+  static UpdateType? _parseUpdateType(String? updateType) {
+    if (updateType == null) return null;
+    if (updateType.toLowerCase().contains('force') ||
+        updateType.toLowerCase().contains('hard')) {
+      return UpdateType.force;
+    } else if (updateType.toLowerCase().contains('soft')) {
+      return UpdateType.soft;
+    } else if (updateType.toLowerCase().contains('none')) {
+      return UpdateType.none;
+    }
+    return null;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'latestVersion': latestVersion?.toString(),
+      'minToleratedVersion': minToleratedVersion?.toString(),
+      'updateType': updateType?.toString().split('.').last,
+      'updateUrl': updateUrl,
+      'releaseNotes': releaseNotes,
+    };
+  }
 
   UpdateInfo copyWith({
     AppVersion? latestVersion,
@@ -41,6 +83,7 @@ enum UpdateType {
   none,
 }
 
+// AppVersion class remains unchanged
 class AppVersion implements Comparable<AppVersion> {
   final int major;
   final int minor;
@@ -60,7 +103,7 @@ class AppVersion implements Comparable<AppVersion> {
 
   @override
   String toString() {
-    return 'AppVersion(major: $major, minor: $minor, patch: $patch)';
+    return '$major.$minor.$patch';
   }
 
   @override

@@ -43,15 +43,17 @@ graph TD
     O --> A
     
     subgraph "Version Definitions"
-        P[currentVersion: App's current version]
-        Q[latestVersion: Newest available version]
-        R[minToleratedVersion: Minimum allowed version]
+        direction LR
+        P[currentVersion:<br>App's current version]
+        Q[latestVersion:<br>Newest available version]
+        R[minToleratedVersion:<br>Minimum allowed version]
     end
     
     subgraph "Update Types"
-        S[Force: User must update to continue]
-        T[Soft: User can choose to update later]
-        U[None: No update prompt shown]
+        direction LR
+        S[Force:<br>User must update to continue]
+        T[Soft:<br>User can choose to update later]
+        U[None:<br>No update prompt shown]
     end
 ```
 

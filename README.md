@@ -50,21 +50,45 @@ The Force Update Management feature is a robust solution for Flutter application
 
 ```mermaid
 graph TD
-    A[App Start] --> B{Check Version}
-    B --> |New Version Available| C{Determine Update Type}
-    B --> |No Update Needed| D[Continue to App]
-    C --> |Force Update| E[Show Full-Screen Update Prompt]
-    C --> |Soft Update| F[Show Dismissible Update Dialog]
-    C --> |No Update| D
-    E --> G{User Action}
-    F --> H{User Action}
-    G --> |Update| I[Redirect to App Store]
-    G --> |Cannot Update| J[Exit App]
-    H --> |Update| I
-    H --> |Later| D
-    I --> K[User Updates App]
-    K --> A
+    A[App Start] --> B[Fetch Version Info]
+    B --> C{Compare Versions}
+    C --> |currentVersion < minToleratedVersion| D[Force Update]
+    C --> |minToleratedVersion <= currentVersion < latestVersion| E{Check Update Type}
+    C --> |currentVersion >= latestVersion| F[No Update Needed]
+    
+    E --> |Force| D
+    E --> |Soft| G[Soft Update]
+    E --> |None| F
+    
+    D --> H[Show Full-Screen Update Prompt]
+    G --> I[Show Dismissible Update Dialog]
+    F --> J[Continue to App]
+    
+    H --> K{User Action}
+    I --> L{User Action}
+    
+    K --> |Update| M[Redirect to App Store]
+    K --> |Cannot Update| N[Exit App]
+    
+    L --> |Update| M
+    L --> |Later| J
+    
+    M --> O[User Updates App]
+    O --> A
+    
+    subgraph "Version Definitions"
+        P[currentVersion: App's current version]
+        Q[latestVersion: Newest available version]
+        R[minToleratedVersion: Minimum allowed version]
+    end
+    
+    subgraph "Update Types"
+        S[Force: User must update to continue]
+        T[Soft: User can choose to update later]
+        U[None: No update prompt shown]
+    end
 ```
+
 
 ## Implementation Guide
 
